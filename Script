@@ -1,0 +1,88 @@
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+-- Crear la ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "TeleportGUI"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = playerGui
+
+-- Frame principal
+local frame = Instance.new("Frame")
+frame.Name = "MainFrame"
+frame.Size = UDim2.new(0, 250, 0, 150)
+frame.Position = UDim2.new(0.5, -125, 0.5, -75)
+frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+frame.BorderSizePixel = 0
+frame.Parent = screenGui
+
+-- Esquinas redondeadas
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 12)
+corner.Parent = frame
+
+-- Título
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 40)
+title.BackgroundTransparency = 1
+title.Text = "Teleport El Paso, Texas"
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.TextScaled = true
+title.Font = Enum.Font.GothamBold
+title.Parent = frame
+
+-- Botón de Teleport
+local button = Instance.new("TextButton")
+button.Size = UDim2.new(0.8, 0, 0, 50)
+button.Position = UDim2.new(0.1, 0, 0.45, 0)
+button.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+button.Text = "Teleport a (3502, 2, -752)"
+button.TextColor3 = Color3.fromRGB(255, 255, 255)
+button.TextScaled = true
+button.Font = Enum.Font.GothamSemibold
+button.Parent = frame
+
+local buttonCorner = Instance.new("UICorner")
+buttonCorner.CornerRadius = UDim.new(0, 10)
+buttonCorner.Parent = button
+
+-- Función de Teleport
+local function teleportPlayer()
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+    
+    if humanoidRootPart then
+        -- Teleport instantáneo usando CFrame
+        humanoidRootPart.CFrame = CFrame.new(3502, 2, -752)
+        
+        -- Pequeña animación de feedback
+        local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+        local goal = {BackgroundColor3 = Color3.fromRGB(0, 255, 100)}
+        local tween = TweenService:Create(button, tweenInfo, goal)
+        tween:Play()
+        
+        wait(0.3)
+        tween = TweenService:Create(button, tweenInfo, {BackgroundColor3 = Color3.fromRGB(0, 170, 255)})
+        tween:Play()
+    end
+end
+
+-- Conectar el botón
+button.MouseButton1Click:Connect(teleportPlayer)
+
+-- Opción para cerrar la GUI (presiona la tecla "P" para toggle)
+local UserInputService = game:GetService("UserInputService")
+local guiVisible = true
+
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    if input.KeyCode == Enum.KeyCode.P then
+        guiVisible = not guiVisible
+        screenGui.Enabled = guiVisible
+    end
+end)
+
+print("GUI de Teleport cargada correctamente. Presiona el botón o la tecla P para ocultar/mostrar.")
